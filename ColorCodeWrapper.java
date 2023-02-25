@@ -12,6 +12,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,7 +40,7 @@ public class ColorCodeWrapper extends SwingWorker {
         System.out.println("Caluculations Started.");
         //Enter end value here system will do that many calculations
         //control c to cancel or close the progress window to cancel
-        long someEndValue = 1000000000L;
+        long someEndValue = 1;
         nEnd = someEndValue;
         
         //cancel();
@@ -57,7 +60,17 @@ public class ColorCodeWrapper extends SwingWorker {
             //could also be use to do multiple files
             //and put them in a zip file;
             
+            File file = new File("C:\\Users\\steph\\OneDrive\\Desktop\\GitHub Html projects\\image2.blend");
+            File fileOut = new File("C:\\Users\\steph\\OneDrive\\Desktop\\GitHub Html projects\\test.jpg");
             
+            try {
+                TheColorZip zip = new TheColorZip(file);
+                BufferedImage image = zip.getEncodedImage();
+                ImageIO.write(image, "png", fileOut);
+                
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
             
             
             

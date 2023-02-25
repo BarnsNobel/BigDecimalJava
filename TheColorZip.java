@@ -44,7 +44,7 @@ public class TheColorZip {
     int compressionFactor = 3;
     int compressionCount = 0;
     File toEncode = null;
-    int buffersize = 1000;
+    int buffersize = 10000;
     long[] compressionBuffer = new long[buffersize];
     
     //
@@ -56,6 +56,7 @@ public class TheColorZip {
      */
     public TheColorZip(File fileTobeEncoded) throws IOException {
         toEncode = fileTobeEncoded;
+        System.out.println(987);
         colorCodeCompression(toEncode);
         
     }
@@ -67,11 +68,14 @@ public class TheColorZip {
      */
     public void colorCodeCompression(File tobeEncodedInImage) throws IOException {
         toEncode = tobeEncodedInImage;
-        
+        System.out.println(987);
         //test and fail improper input(file and outDir;
         int byteCount = 0;
-        int testByte = 0;
+        int testByte = 1;
+        System.out.println(987);
         FileReader reader = new FileReader(toEncode);
+        testByte = reader.read();
+        
         while (testByte != -1) {
             testByte = reader.read();
             byteCount++;
@@ -138,7 +142,7 @@ public class TheColorZip {
     int countTest = 0;
     public void encodeCompression(int dataPoint) throws IOException {
         
-        if (countTest < 2) {
+        if (countTest < 3) {
             if (countCompress >= buffersize) {
                 compressIntegerData();
                 countCompress = 0;
@@ -162,8 +166,8 @@ public class TheColorZip {
         long[] outArrayBuffer = new long[10];
         //Random rand = new Random(dataPoint);
         BigDecimal data = new BigDecimal(1.0);
-        int factor = 100001;
-        for (int i = 0;i < compressionBuffer.length-50;i++) {
+        int factor = 101;
+        for (int i = 0;i < compressionBuffer.length;i++) {
             //System.out.println("IN: "+ compressionBuffer[i]);
             long in = compressionBuffer[i]+3;
             long num = 0;
@@ -172,84 +176,36 @@ public class TheColorZip {
                 in = in*-1;
             }
             num = Long.parseLong(""+factor+""+(in));
-            //System.out.println(num);
+            System.out.println(num);
             
-            data = data.multiply(data);
+            data = data.multiply(new BigDecimal(num));
             System.out.println("Num IN: "+ num);
             
             factor++;
             factor++;
             
         }
+         
+        long[] pix = numberCompression(data.longValue());
+        int[] pix2 = compressLongs(pix);
         
-    
-        //System.out.println();
-        //System.out.println(data);
-        
-        if ((int) red != red) {
-            throw new IOException("red outPut value out of range: "+red);
-        }
-        if ((int) green != green) {
-            throw new IOException("green outPut value out of range: "+green);
-        }
-        if ((int) blue != blue) {
-            throw new IOException("blue outPut value out of range: "+blue);
-        }
-        if ((int) alpha != alpha) {
-            throw new IOException("alpha outPut value out of range: "+alpha);
-        }
-        
-        /*red = data/(scale*scale*scale);
-        data = data - red*scale*scale*scale;
-        green = data/(scale*scale);
-        data = data-green*scale*scale;
-        blue = data/(scale);
-        data = data-blue*scale;
-        alpha = data;
-        if ((int) red != red) {
-            throw new IOException("red outPut value out of range: "+red);
-        }
-        if ((int) green != green) {
-            throw new IOException("green outPut value out of range: "+green);
-        }
-        if ((int) blue != blue) {
-            throw new IOException("blue outPut value out of range: "+blue);
-        }
-        if ((int) alpha != alpha) {
-            throw new IOException("alpha outPut value out of range: "+alpha);
-        }*/
-        /*alpha = 255;
-        red = 255;
-        green = 255;
-        blue = 255;*/
-        //red = r;
-        //green = (int) g;
-        //blue = (int) b;
-        //alpha = (int) a;
-        long data2 = red*scale*scale*scale+green*scale*scale+blue*scale+alpha;
-        System.out.println(data2);
         
         
         
         System.out.println("r:"+red+" g:"+green+" b:"+blue+" a:"+alpha);
-        //writePixel();
-        //System.out.println();
-        //combonation number needed;
-        
-        int[] pix = new int[]{(int)red,(int)green,(int)blue,(int)alpha};
-        //decrypt
-        factor = 10001;
-        
+        System.out.println(""+data); 
+        factor = 101;
+        long dat = data.longValue();
         for (int i = compressionBuffer.length-1;i >= 0 ;i--) {
             boolean found = false;
-            for (int n = 3;n < 512;n++) {
+            for (int n = 3;n < 70000;n++) {
                
                if (!(found)) {
                    long num = Long.parseLong(""+(factor+i)+""+(n));
-                   if (data2%num == 0) {
+                   if (dat%num == 0) {
                        found = true;
                        System.out.println("found: "+num);
-                       data2 = data2/num;
+                       dat = dat/ num;
                        compressionBuffer[i] = n;
                    }
                }
@@ -261,18 +217,83 @@ public class TheColorZip {
         //decompressDataPacket(pix);
         
     }
-    public int[] numberCompression(long uncomp ) {
+    
+    public 
+    
+    
+    
+    public long[] numberCompression(long uncomp ) throws IOException {
+        
+        if (uncomp > Long.MAX_VALUE-255) {
+            throw new IOException("Data Set Comprimised, is too large: "+uncomp);
+        }
+        
         long data = uncomp;
         long r = data/(scale*scale*scale);
         data = data - r*scale*scale*scale;
         long g = data/(scale*scale);
         data = data-g*scale*scale;
         long b = data/(scale);
+     
         data = data-b*scale;
         long a = data;
-        return new int[]{(int) r, (int) g, (int) b, (int) a};
+        return new long[]{r,  g,  b,  a};
     }
     
+    
+    public int[] compressLongs(long[] uncomp) throws IOException{
+        long data = uncomp[0];
+        int scale = (int) this.scale;
+        red = red+ data/(scale*scale*scale);
+        data = data - red*scale*scale*scale;
+        green = green/(scale*scale);
+        data = data-green*scale*scale;
+        blue = data/(scale);
+        data = data-blue*scale;
+        alpha = data;
+        
+        data = uncomp[1];
+        red = red+ data/(scale*scale*scale);
+        data = data - red*scale*scale*scale;
+        green = green/(scale*scale);
+        data = data-green*scale*scale;
+        blue = data/(scale);
+        data = data-blue*scale;
+        alpha = data;
+        
+        data = uncomp[2];
+        red = red+ data/(scale*scale*scale);
+        data = data - red*scale*scale*scale;
+        green = green/(scale*scale);
+        data = data-green*scale*scale;
+        blue = data/(scale);
+        data = data-blue*scale;
+        alpha = data;
+        
+        data = uncomp[3];
+        red = red+ data/(scale*scale*scale);
+        data = data - red*scale*scale*scale;
+        green = green/(scale*scale);
+        data = data-green*scale*scale;
+        blue = data/(scale);
+        data = data-blue*scale;
+        alpha = data;
+        
+        if ((int) red != red) {
+            throw new IOException("red outPut value out of range: "+red);
+        }
+        if ((int) green != green) {
+            throw new IOException("green outPut value out of range: "+green);
+        }
+        if ((int) blue != blue) {
+            throw new IOException("blue outPut value out of range: "+blue);
+        }
+        if ((int) alpha != alpha) {
+            throw new IOException("alpha outPut value out of range: "+alpha);
+        }
+        
+        return new int[]{(int)red, (int) green, (int) blue, (int) alpha};
+    } 
     
     public void readImage(File imagefile, File output) {
         

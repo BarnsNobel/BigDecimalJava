@@ -4,7 +4,7 @@
  */
 package utilities;
 
-import java.math.BigDecimal;
+import java.io.File;
 
 /**
  *
@@ -13,11 +13,17 @@ import java.math.BigDecimal;
 public class Utilities {
     public Utilities() {
         //test bed
-        BigDec test = new BigDec(Math.PI);
+        /*BigDec test = new BigDec(Math.PI);
         System.out.println(test.toString().length());
         BigDec test2 = test.times(test);
-        System.out.println(test2);
+        System.out.println(test2);*/
+        
+        ColorCodeWrapper wrapper = new ColorCodeWrapper();
+        wrapper.run();
+        
     }
+    
+    
     /**
      * @param args the command line arguments
      */
